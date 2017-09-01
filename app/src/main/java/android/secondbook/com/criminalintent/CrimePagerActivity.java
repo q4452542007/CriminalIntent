@@ -15,7 +15,7 @@ import android.os.Bundle;
 import java.util.List;
 import java.util.UUID;
 
-public class CrimePagerActivity extends AppCompatActivity {
+public class CrimePagerActivity extends AppCompatActivity implements CrimeFragment.Callbacks{
 
     private static final String EXTRA_CRIME_ID = "android.secondbook.com.criminalintent.crime_id";
 //  private static final String EXTRA_SUBTITLE_VISBLE = "android.secondbook.com.criminalintent.subtitle_visble";
@@ -70,5 +70,10 @@ public class CrimePagerActivity extends AppCompatActivity {
         }
 
         }
+
+    @Override
+    public void onCrimeUpdated(Crime crime) {
+
+    }
 }
 

@@ -1,5 +1,7 @@
 package android.secondbook.com.criminalintent;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -32,6 +34,23 @@ public class CrimeListFragment extends Fragment {
 //    private Boolean noCrime = false;
     private Button newCrimeButton;
     private TextView emptyTextView;
+    private Callbacks mCallbacks;
+
+    public interface Callbacks {
+        void onCrimeSelected(Crime crime);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mCallbacks = (Callbacks) activity;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = null;
+    }
 
     @Override
     public void onCreate( Bundle savedInstanceState) {
@@ -51,8 +70,11 @@ public class CrimeListFragment extends Fragment {
                 Crime crime = new Crime();
                 CrimeLab.get(getActivity()).addCrime(crime);
 //                noCrime = true;
-                Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());
-                startActivity(intent);
+                /*Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());
+                startActivity(intent);*/
+                updateUI();
+                mCallbacks.onCrimeSelected(crime);
+
             }
         });
 
@@ -82,6 +104,8 @@ public class CrimeListFragment extends Fragment {
         outState.putBoolean(SAVED_SUBTITLE_VISIBLE, mSubtitleVisible);
     }
 
+
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -101,9 +125,11 @@ public class CrimeListFragment extends Fragment {
             case R.id.menu_item_new_crime:
                 Crime crime = new Crime();
                 CrimeLab.get(getActivity()).addCrime(crime);
- //             noCrime = true;
-                Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());
-                startActivity(intent);
+                /*Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());
+                startActivity(intent);*/
+                updateUI();
+                mCallbacks.onCrimeSelected(crime);
+
                 return true;
             case R.id.menu_item_show_subtiltle:
                 mSubtitleVisible = !mSubtitleVisible;
@@ -128,16 +154,16 @@ public class CrimeListFragment extends Fragment {
         activity.getSupportActionBar().setSubtitle(subtitle);
     }
 
-    private void updateUI() {
+    public void updateUI() {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         List<Crime> crimes = crimeLab.getCrimes();
-        for (int i = 0; i < crimes.size(); i++) {
+        /*for (int i = 0; i < crimes.size(); i++) {
 
             if (crimes.get(i).getTitle() == null) {
                 crimeLab.deleteCrime(crimes.get(i));
                 crimes.remove(i);
             }
-        }
+        }*/
 
 
         if (mAdapter ==null) {
@@ -151,9 +177,11 @@ public class CrimeListFragment extends Fragment {
         if (crimes.size() != 0) {
             emptyTextView.setText(null);
             newCrimeButton.setVisibility(View.INVISIBLE);
+            newCrimeButton.setEnabled(false);
         } else {
             emptyTextView.setText(R.string.empty);
             newCrimeButton.setVisibility(View.VISIBLE);
+            newCrimeButton.setEnabled(true);
         }
 
     }
@@ -186,9 +214,9 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            Intent intent = CrimePagerActivity.newIntent(getActivity(),mCrime.getId());
-            intent.putExtra(CRIME_SOVLED, mSolvedCheckBox.isChecked());
-            startActivity(intent);
+            /*Intent intent = CrimePagerActivity.newIntent(getActivity(),mCrime.getId());
+            intent.putExtra(CRIME_SOVLED, mSolvedCheckBox.isChecked());*/
+            mCallbacks.onCrimeSelected(mCrime);
         }
 
     }
